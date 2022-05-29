@@ -1,8 +1,10 @@
 import argparse
 import os
+import sys
 import time
 import warnings
 from typing import Optional, Tuple, Union
+sys.path.append(os.path.abspath(os.path.join(__file__, "..", "..")))
 
 import torch
 import torchaudio as ta
