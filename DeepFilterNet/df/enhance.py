@@ -13,6 +13,7 @@ from numpy import ndarray
 from torch import Tensor, nn
 from torch.nn import functional as F
 from torchaudio.backend.common import AudioMetaData
+from thop import profile, clever_format
 
 import df
 from df import config
@@ -38,6 +39,8 @@ def main(args):
         os.mkdir(args.output_dir)
     df_sr = ModelParams().sr
     n_samples = len(args.noisy_audio_files)
+    total_rtf = 0
+    counter = 0
     for i, file in enumerate(args.noisy_audio_files):
         progress = (i + 1) / n_samples * 100
         audio, meta = load_audio(file, df_sr)
@@ -49,6 +52,8 @@ def main(args):
         t_audio = audio.shape[-1] / df_sr
         t = t1 - t0
         rtf = t / t_audio
+        total_rtf += rtf
+        counter += 1
         fn = os.path.basename(file)
         p_str = f"{progress:2.0f}% | " if n_samples > 1 else ""
         logger.info(f"{p_str}Enhanced noisy audio file '{fn}' in {t:.1f}s (RT factor: {rtf:.3f})")
@@ -56,6 +61,7 @@ def main(args):
         save_audio(
             file, audio, sr=meta.sample_rate, output_dir=args.output_dir, suffix=suffix, log=False
         )
+    logger.info(f"Avg RT factor: {(total_rtf / counter):.3f}")
 
 
 def init_df(
@@ -243,6 +249,11 @@ def enhance(
     nb_df = getattr(model, "nb_df", getattr(model, "df_bins", ModelParams().nb_df))
     spec, erb_feat, spec_feat = df_features(audio, df_state, nb_df, device=get_device())
     enhanced = model(spec, erb_feat, spec_feat)[0].cpu()
+
+    # macs, params = profile(model, inputs=(spec, erb_feat, spec_feat), verbose=False)
+    # macs, params = clever_format([macs, params], "%.3f")
+    # print('macs: ', macs)
+    # print('params: ', params)
     enhanced = as_complex(enhanced.squeeze(1))
     if atten_lim_db is not None and abs(atten_lim_db) > 0:
         lim = 10 ** (-abs(atten_lim_db) / 20)

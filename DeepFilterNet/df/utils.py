@@ -58,6 +58,7 @@ def get_device():
             DEVICE = torch.device("cpu")
     else:
         DEVICE = torch.device(s)
+    # print(DEVICE)
     return DEVICE
 
 
