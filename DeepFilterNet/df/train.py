@@ -1,9 +1,11 @@
 import argparse
 import os
+import sys
 import random
 import signal
 import sys
 from typing import Dict, List, Optional, Tuple
+sys.path.append(os.path.abspath(os.path.join(__file__, "..", "..")))
 
 import numpy as np
 import torch

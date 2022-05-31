@@ -2,11 +2,13 @@
 
 import argparse
 import os
+import sys
 import time
 import warnings
 from multiprocessing import Pool
 from tempfile import NamedTemporaryFile
 from typing import List, Optional
+sys.path.append(os.path.abspath(os.path.join(__file__, "..", "..", "..")))
 
 import h5py as h5
 import numpy as np
@@ -135,6 +137,8 @@ class PreProcessingDataset(Dataset):
         fn = self.file_names[index]
         logger.debug(f"Reading audio file {fn}")
         x = self.read(fn)
+        # if x.dim() == 2 and x.shape[0] > 16:
+        #     x = x[:16, :]
         assert x.dim() == 2 and x.shape[0] <= 16, f"Got sample {fn} with unexpected shape {x.shape}"
         n_samples = x.shape[1]
         if self.codec == "vorbis":
