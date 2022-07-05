@@ -131,6 +131,8 @@ def main():
         mask_only=mask_only,
         train_df_only=train_df_only,
     )
+    _print_networks([model])
+
 
     bs: int = config("BATCH_SIZE", 1, int, section="train")
     bs_eval: int = config("BATCH_SIZE_EVAL", 0, int, section="train")
@@ -309,6 +311,21 @@ def main():
     metrics.update({n: torch.mean(torch.stack(vals)).item() for n, vals in losses.get_summaries()})
     log_metrics(f"[{epoch}] [test]", metrics)
     logger.info("Finished training")
+
+def _print_networks(models: list):
+    print(f"This project contains {len(models)} models, the number of the parameters is: ")
+
+    params_of_all_networks = 0
+    for idx, model in enumerate(models, start=1):
+        params_of_network = 0
+        for param in model.parameters():
+            params_of_network += param.numel()
+        for name, parameters in model.named_parameters():
+            print(name, ':', parameters.size())
+        print(f"\tNetwork {idx}: {params_of_network / 1e6} million.")
+        params_of_all_networks += params_of_network
+
+    print(f"The amount of parameters in the project is {params_of_all_networks / 1e6} million.")
 
 
 def run_epoch(
