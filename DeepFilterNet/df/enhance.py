@@ -4,6 +4,7 @@ import sys
 import time
 import warnings
 from typing import Optional, Tuple, Union
+
 sys.path.append(os.path.abspath(os.path.join(__file__, "..", "..")))
 
 import torch
@@ -65,13 +66,13 @@ def main(args):
 
 
 def init_df(
-    model_base_dir: Optional[str] = None,
-    post_filter: bool = False,
-    log_level: str = "INFO",
-    log_file: Optional[str] = "enhance.log",
-    config_allow_defaults: bool = False,
-    epoch: Union[str, int, None] = "best",
-    default_model: str = "DeepFilterNet2",
+        model_base_dir: Optional[str] = None,
+        post_filter: bool = False,
+        log_level: str = "INFO",
+        log_file: Optional[str] = "enhance.log",
+        config_allow_defaults: bool = False,
+        epoch: Union[str, int, None] = "best",
+        default_model: str = "DeepFilterNet2",
 ) -> Tuple[nn.Module, DF, str]:
     """Initializes and loads config, model and deep filtering state.
 
@@ -173,7 +174,7 @@ def df_features(audio: Tensor, df: DF, nb_df: int, device=None) -> Tuple[Tensor,
 
 
 def load_audio(
-    file: str, sr: Optional[int], verbose=True, **kwargs
+        file: str, sr: Optional[int], verbose=True, **kwargs
 ) -> Tuple[Tensor, AudioMetaData]:
     """Loads an audio file using torchaudio.
 
@@ -206,13 +207,13 @@ def load_audio(
 
 
 def save_audio(
-    file: str,
-    audio: Union[Tensor, ndarray],
-    sr: int,
-    output_dir: Optional[str] = None,
-    suffix: Optional[str] = None,
-    log: bool = False,
-    dtype=torch.int16,
+        file: str,
+        audio: Union[Tensor, ndarray],
+        sr: int,
+        output_dir: Optional[str] = None,
+        suffix: Optional[str] = None,
+        log: bool = False,
+        dtype=torch.int16,
 ):
     outpath = file
     if suffix is not None:
@@ -234,7 +235,7 @@ def save_audio(
 
 @torch.no_grad()
 def enhance(
-    model: nn.Module, df_state: DF, audio: Tensor, pad=False, atten_lim_db: Optional[float] = None
+        model: nn.Module, df_state: DF, audio: Tensor, pad=False, atten_lim_db: Optional[float] = None
 ):
     model.eval()
     bs = audio.shape[0]
@@ -266,7 +267,7 @@ def enhance(
         # Thus, the STFT/ISTFT loop introduces an algorithmic delay of n_fft - hop.
         assert n_fft % hop == 0  # This is only tested for 50% and 75% overlap
         d = n_fft - hop
-        audio = audio[:, d : orig_len + d]
+        audio = audio[:, d: orig_len + d]
     return audio
 
 
@@ -286,8 +287,8 @@ def setup_df_argument_parser(default_log_level: str = "INFO") -> argparse.Argume
         type=str,
         default=None,
         help="Model directory containing checkpoints and config. "
-        "To load a pretrained model, you may just provide the model name, e.g. `DeepFilterNet`. "
-        "By default, the pretrained DeepFilterNet2 model is loaded.",
+             "To load a pretrained model, you may just provide the model name, e.g. `DeepFilterNet`. "
+             "By default, the pretrained DeepFilterNet2 model is loaded.",
     )
     parser.add_argument(
         "--pf",
